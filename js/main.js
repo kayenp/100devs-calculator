@@ -131,17 +131,18 @@ function CreateCalcObj(){
                 valStore += input;
                 screenElem.innerText = screenElem.innerText + input;
             } else if (input === "*" || input === "/" || input === "+" || input === "-"){ //if input is an operator, but !== "="
-                if (valStore !== "")
-                    {valArr.push(valStore);
+                if (valStore !== ""){
+                    valArr.push(valStore);
                     valArr.push(input);
                 }
+                valStore = "";
                 if (Number(valArr[lastIndex]) || valArr[lastIndex] === "0" || valArr[lastIndex] === "." || valArr[lastIndex] === undefined){
-                    valStore = "";
                     screenElem.innerText += input;
                 } else {
-                    valArr.splice(lastIndex, 1, input);
-                    valStore = "";
                     (Number(screenElem.innerText[lastChar])) ? screenElem.innerText += input : screenElem.innerText = screenElem.innerText.slice(0,lastChar) + input; //if last char of screenElem.innerText is number vs operator
+                    if (!Number(screenElem.innerText[lastChar]) || !screenElem.innerText[lastChar] === "." || !screenElem.innerText[lastChar] === "0"){
+                        valArr.splice(lastIndex, 1, input);
+                    };                    
                 };
             }
         }
