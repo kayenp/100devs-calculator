@@ -104,7 +104,7 @@ PLAN
 
 //Calculator object contains all other objects
 function CreateCalcObj(){
-    let screenDiv = document.querySelector(".div-output");
+    let screenElem = document.querySelector(".div-output");
     let btnElemArr = Array.from(document.querySelectorAll(".btn"));
     let btnTxtArr = btnElemArr.map((elem) => elem.innerText);
     let numBtnArr = btnTxtArr.filter((elem) => (Number(elem)));
@@ -119,26 +119,86 @@ function CreateCalcObj(){
     let storageObj = new CreateStorageObj();
 
     //creates a screen object
-    function CreateScreenObj(){
 
-        this.displayStore = "";
-        this.updateValues = function(val) {
-            let displayLength = this.displayStore.length;
-            if((Number(val)) || val === "."){
-                console.log(calcDisplay);
-                calcDisplay = calcDisplay + val;
-                console.log(calcDisplay);
-            } else if (val === "+" || val === "-" || val === "*" || val === "/"){
-                if((!Number(this.display[displayLength-1])) || this.display[displayLength-1] === "."){
-                    this.displayStore = this.displayStore.slice(0, displayLength-1) + val;
-                } else if (this.display !== "") {
-                    storageObj.value.push(this.display);
-                    storageObj.value.push(val);
-                    this.display = this.display + val;
+    function CreateScreenObj(){
+        let valStore = "";
+        let valArr = [];
+        this.update = function(input){
+            let lastVal = valStore.length-1;
+            let lastIndex = valArr.length-1;
+            let lastChar = screenElem.innerText.length-1;
+            if (Number(input) || input === "0" || input === "."){ //if input is a number or "."
+                valStore += input;
+                screenElem.innerText = screenElem.innerText + input;
+            } else if (input === "*" || input === "/" || input === "+" || input === "-"){ //if input is an operator, but !== "="
+                if (valStore !== "")
+                    {valArr.push(valStore);
+                    valArr.push(input);
                 }
+                if (Number(valArr[lastIndex]) || valArr[lastIndex] === "0" || valArr[lastIndex] === "." || valArr[lastIndex] === undefined){
+                    valStore = "";
+                    screenElem.innerText += input;
+                } else {
+                    valArr.splice(lastIndex, 1, input);
+                    valStore = "";
+                    (Number(screenElem.innerText[lastChar])) ? screenElem.innerText += input : screenElem.innerText = screenElem.innerText.slice(0,lastChar) + input; //if last char of screenElem.innerText is number vs operator
+                };
             }
         }
-    };
+    }
+    
+    /*
+    ^^^^^^^^^^^^^^^^^^^^^^^
+    REPLACE
+    STEPS
+        1. New variable (valStore) for storing values as strings.
+        2. New variable (valArr) for storing array to later be parsed
+        3. Write fn:
+            3. IF number or "." is added to valStore, screenElem.innerText is updated
+                a. fn needs to accept variable
+                a. valStore is concatenated to screenElem.innerText's existing values
+            4. When operator is added to valStore:
+                a. Conditional to check if last input char was also operator or "."
+                    1. Last input was operator or ".", EXCEPT "=", replaces last input with current operator
+                    2. Last input was NOT operator:
+                        a. valStore is added to array valArr
+                        b. AND current operator is added to valArr
+                        c. AND valStore is cleared
+                    3. Last input was "="
+                        a. Evaluates expression in valArr (fn valCalc)
+                            1. Goes through array elements from left-to-right and compares operators
+                                a. "*" or "/" operation between element before and element after operator
+                                    1. Outputs the evaluation to a new array (valResult)
+                                        a. Write functions for each operator
+                                        b. Functions should be stored in single object to be inherited (prototype chain)
+                                            1. Operators need to be in separate object to use prototyping
+                                    2. valResult is input back into valCalc to repeat process until no "*" or "/" is found
+                                b. "+" or "-" operation between element before and element after operator
+                                    1. Outputs the evaluation to a new array (valResult)
+                                    2. valResult is input back into valCalc to repeat process until no "+" or "-" is found
+                        b. All operators and expressions are evaluated return valResult to screenElem.innerText
+                                
+
+    ==========================
+    DEFINE WHAT'S HAPPENING
+        1. Value is being output to calculator display
+        2. When operator button is pressed:
+            a. Existing value in display gets put into array
+            b. Operator symbol gets added to array as a separate element
+                - Works fine if this is first time operator symbol has been added
+                - Adds previous values within display (double adding values) if this is second or more time operator symbol has been added
+                    ^^^
+                    THIS IS THE ISSUE
+
+    POSSIBLE SOLUTIONS
+        1. Values should not be retrieved from calculator display and instead from another object
+            WHAT THIS DOES
+                1. Separates where values for array are coming from, solving issue with array retrieving double values from display
+                    - Requires additional object for storing values
+        2. 
+        
+    */
+
     let screenObj = new CreateScreenObj();
     
     //Object containing calc btns 
@@ -169,8 +229,8 @@ function CreateCalcObj(){
     //Object for returning the innerText values of elements it's attached to
     function ReturnInnerText(){ 
         this.method = function(){
-            console.log(this);
-            screenObj.updateValues(this.innerText);
+            //console.log(this);
+            screenObj.update(this.innerText);
         }
     }
     let innerTextVal = new ReturnInnerText();
@@ -199,8 +259,4 @@ function CreateCalcObj(){
 
 
 let calcObj = new CreateCalcObj();
-console.log(calcObj);
-
-let val = 3.141592653589793;
-console.log(val);
 
