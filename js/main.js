@@ -110,6 +110,8 @@ function CreateCalcObj(){
     let numBtnArr = btnTxtArr.filter((elem) => (Number(elem)));
     let opBtnArr = btnTxtArr.filter((elem) => ((!Number(elem)) && (elem !== ".") && (elem !== "0")));
     let opBtnElemArr = btnElemArr.filter((elem) => (elem.innerText !== Number(elem) && (elem.innerText !== "0") && (elem.innerText !== ".")));
+
+
     
     function CreateStorageObj(){
         this.value = [];
@@ -118,24 +120,27 @@ function CreateCalcObj(){
 
     //creates a screen object
     function CreateScreenObj(){
-        this.display = "";
-        this.updateDisplay = function(val) {
-            let displayLength = this.display.length;
+
+        this.displayStore = "";
+        this.updateValues = function(val) {
+            let displayLength = this.displayStore.length;
             if((Number(val)) || val === "."){
-                this.display = this.display + val;
+                console.log(calcDisplay);
+                calcDisplay = calcDisplay + val;
+                console.log(calcDisplay);
             } else if (val === "+" || val === "-" || val === "*" || val === "/"){
                 if((!Number(this.display[displayLength-1])) || this.display[displayLength-1] === "."){
-                    this.display = this.display.slice(0, displayLength-1) + val;
+                    this.displayStore = this.displayStore.slice(0, displayLength-1) + val;
                 } else if (this.display !== "") {
+                    storageObj.value.push(this.display);
+                    storageObj.value.push(val);
                     this.display = this.display + val;
                 }
             }
-            screenDiv.innerText = this.display; 
-            console.log(storageObj.value);
         }
     };
     let screenObj = new CreateScreenObj();
-
+    
     //Object containing calc btns 
     function CreateBtnsObj(){
         return btnTxtArr.reduce((acc,currVal) => {
@@ -149,24 +154,12 @@ function CreateCalcObj(){
         },{})
     }
     let btnsObj = new CreateBtnsObj();
+    
 
     //stores screenObj.display value to array
     //ADD -- function to add currently pressed operator to array
     //ADD -- function the check if last value in array is operator, if so overwrites with most recent operator
-    function Operation(){
-        this.valArr = [screenObj.display];
-        console.log(this);
-        this.retrieveInner = function(){
-            if ((!Number(screenObj.display)) || (screenObj.display !== "0") || (screenObj.display !== ".")){
-                this.updateVal(this.innerText);
-            }};
-        this.updateVal = function(val) {
-            this.valArr = val;
-            return this;
-        }
-    }
-    let opObj = new Operation();
-    console.log(opObj.updateVal())
+
 
     //Sends inputs to screenObj.display when calculator buttons are pressed
     function SendInputs(){
@@ -176,7 +169,8 @@ function CreateCalcObj(){
     //Object for returning the innerText values of elements it's attached to
     function ReturnInnerText(){ 
         this.method = function(){
-            screenObj.updateDisplay(this.innerText);
+            console.log(this);
+            screenObj.updateValues(this.innerText);
         }
     }
     let innerTextVal = new ReturnInnerText();
@@ -206,4 +200,7 @@ function CreateCalcObj(){
 
 let calcObj = new CreateCalcObj();
 console.log(calcObj);
+
+let val = 3.141592653589793;
+console.log(val);
 
