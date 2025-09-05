@@ -177,14 +177,27 @@ function CreateCalcObj(){
                                     1. Outputs the evaluation to a new array (valResult)
                                     2. valResult is input back into valCalc to repeat process until no "+" or "-" is found
                         b. All operators and expressions are evaluated return valResult to screenElem.innerText
-**OPERATOR FUNCTIONS**
+**CALCULATION**
     WHAT NEEDS TO HAPPEN
         1. "=" calls fn (calculate) to evaluate arg valArr
         2. calculate passes through valArr from left-to-right in order-of-operations and sends elem[index-1] & elem[index+1] to operation fn (sum,subtract,multiply,divide)
         3. operation fn .splice()s return value into position where elem[index-1], elem[index](operator symbol), elem[index+1] were in valArr
         4. valArr gets returned to calculate
         5. Steps 2-4 repeat until only 1 value left in array
-        6. Return final value in array as output to screenDiv                       
+        6. Return final value in array as output to screenDiv
+        STEPS
+            1. Define conditional for "=" input
+            2. Define "calculate" obj for "=" click event
+                - valArr is passed in as arg
+                - creates copy of valArr (valArrCopy) for manipulation
+                - parses valArrCopy and sends to appropriate helper fn
+                - passes args to helper fn
+            3. Define helper fns for "calculate" that performs the appropriate operation (sum,subtract,multiply,divide)
+                - helpers should be located in "calculate" obj
+                - takes args passed from calculate
+                - performs operation on args
+                - returns result into by removing index values of args passed in and replacing with result
+            3. Attach "calculate" obj to "=" button
 
     ==========================
     DEFINE WHAT'S HAPPENING
