@@ -149,22 +149,21 @@ function CreateCalcObj(){
     }
     
     /*
-    ^^^^^^^^^^^^^^^^^^^^^^^
-    REPLACE
+**SCREEN OUTPUT & VALUE STORAGE**
     STEPS
-        1. New variable (valStore) for storing values as strings.
-        2. New variable (valArr) for storing array to later be parsed
+        1. New variable (valStore) for storing values as strings. <---- DONE
+        2. New variable (valArr) for storing array to later be parsed <---- DONE
         3. Write fn:
-            3. IF number or "." is added to valStore, screenElem.innerText is updated
-                a. fn needs to accept variable
-                a. valStore is concatenated to screenElem.innerText's existing values
-            4. When operator is added to valStore:
-                a. Conditional to check if last input char was also operator or "."
-                    1. Last input was operator or ".", EXCEPT "=", replaces last input with current operator
-                    2. Last input was NOT operator:
-                        a. valStore is added to array valArr
-                        b. AND current operator is added to valArr
-                        c. AND valStore is cleared
+            3. IF number or "." is added to valStore, screenElem.innerText is updated <---- DONE
+                a. fn needs to accept variable <---- DONE
+                a. valStore is concatenated to screenElem.innerText's existing values <---- DONE
+            4. When operator is added to valStore: <---- DONE
+                a. Conditional to check if last input char was also operator or "." <---- DONE
+                    1. Last input was operator or ".", EXCEPT "=", replaces last input with current operator <---- DONE
+                    2. Last input was NOT operator: <---- DONE
+                        a. valStore is added to array valArr <---- DONE
+                        b. AND current operator is added to valArr <---- DONE
+                        c. AND valStore is cleared <---- DONE
                     3. Last input was "="
                         a. Evaluates expression in valArr (fn valCalc)
                             1. Goes through array elements from left-to-right and compares operators
@@ -178,7 +177,14 @@ function CreateCalcObj(){
                                     1. Outputs the evaluation to a new array (valResult)
                                     2. valResult is input back into valCalc to repeat process until no "+" or "-" is found
                         b. All operators and expressions are evaluated return valResult to screenElem.innerText
-                                
+**OPERATOR FUNCTIONS**
+    WHAT NEEDS TO HAPPEN
+        1. "=" calls fn (calculate) to evaluate arg valArr
+        2. calculate passes through valArr from left-to-right in order-of-operations and sends elem[index-1] & elem[index+1] to operation fn (sum,subtract,multiply,divide)
+        3. operation fn .splice()s return value into position where elem[index-1], elem[index](operator symbol), elem[index+1] were in valArr
+        4. valArr gets returned to calculate
+        5. Steps 2-4 repeat until only 1 value left in array
+        6. Return final value in array as output to screenDiv                       
 
     ==========================
     DEFINE WHAT'S HAPPENING
