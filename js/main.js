@@ -111,15 +111,45 @@ function CreateCalcObj(){
     let opBtnArr = btnTxtArr.filter((elem) => ((!Number(elem)) && (elem !== ".") && (elem !== "0")));
     let opBtnElemArr = btnElemArr.filter((elem) => (elem.innerText !== Number(elem) && (elem.innerText !== "0") && (elem.innerText !== ".")));
 
+    //calculate object
+    function Calculate(){
+        this.operations = {
+            sum: function(a,b){
+                console.log("sum up here")
+                console.log(a, b)
+                console.log(a + b)
+                return Number(a) + Number(b)},
+            subtract: function(a,b){return a - b},
+            multiply: function(a,b){return a * b},
+            divide: function(a,b){return a / b},
+        };
+        this.calculate = function(arr){
+            let arrCopy = arr.slice();
+            for(let i = 0; i < arrCopy.length; i++){
+                if(!Number(arrCopy[i])){
+                    let sym = this.symParse(arrCopy[i]);
+                    (arrCopy.splice((i-1), 3, this.operations[`${sym}`](Number(arrCopy[(i-1)]), Number(arrCopy[(i+1)]))));
+                    console.log(arrCopy);
+                }
+            }
+        }
+        this.symParse = function(sym){
+            switch(sym){
+                case "+":
+                    return "sum";
+                case "-":
+                    return "subtract";
+                case "*":
+                    return "multiply";
+                case "/":
+                    return "divide";
+            };
+        };
 
-    
-    function CreateStorageObj(){
-        this.value = [];
     }
-    let storageObj = new CreateStorageObj();
+    let calculateObj = new Calculate();
 
     //creates a screen object
-
     function CreateScreenObj(){
         let valStore = "";
         let valArr = [];
@@ -144,9 +174,21 @@ function CreateCalcObj(){
                         valArr.splice(lastIndex, 1, input);
                     };                    
                 };
+            } else {
+                if(valStore !== ""){
+                    console.log(valStore);
+                    valArr.push(valStore);
+                    console.log(valArr);
+                    calculateObj.calculate(valArr);
+                } else {
+                    valArr.splice(lastIndex, 1);
+                    calculateObj.calculate(valArr);
+                };
             }
         }
+
     }
+    let screenObj = new CreateScreenObj();
     
     /*
 **SCREEN OUTPUT & VALUE STORAGE**
@@ -218,8 +260,6 @@ function CreateCalcObj(){
         2. 
         
     */
-
-    let screenObj = new CreateScreenObj();
     
     //Object containing calc btns 
     function CreateBtnsObj(){
@@ -258,20 +298,10 @@ function CreateCalcObj(){
     //Attaches obj to display values to screen to calc btns
     function addBtnListeners(){
         for(let elem of btnElemArr){
-            if(elem.innerText !== "=") {
-                elem.addEventListener("click", innerTextVal.method)
-            };
+            elem.addEventListener("click", innerTextVal.method)
         };
     };
     addBtnListeners();
-
-    //Attaches obj to retrieve innertext to op calc btns
-    function addOpBtnListeners(){
-        for(let elem of opBtnElemArr){
-            
-        };
-    };
-    addOpBtnListeners();
 
     console.log(innerTextVal.method)
 }
