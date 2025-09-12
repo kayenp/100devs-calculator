@@ -47,28 +47,43 @@ let btnTxt = btnElem.map((elem) => elem.innerText);
 //adds an event listener to each button
 (function() {
     for(let elem of btnElem){
-        elem.addEventListener("click", (() => console.log(`this button is ${elem.innerText}`)));
+        elem.addEventListener("click", (() => {}));
     }
 })();
 
-//splits elements at the operator and pushes the values and operators as separate elements into an array
-function splitAtOp(str){
-    let val = "";
-    let arr = [];
-    for (let elem of str){
-        if(+elem || elem === "0" || elem === ".") {
-            val += elem
-        } else {
-            arr.push(val);
-            arr.push(elem);
-            val = "";
+(function() {
+    for(let elem of btnElem){
+        console.log(+elem.innerText)
+        if(+elem.innerText){
+            elem.addEventListener("click", storeNumValue);
+        };
+    }
+})();
+
+function storeNumValue(){
+    calculator.value += this.innerText;
+    console.log(calculator.value)
+}
+
+let calculator = new function(){
+    this.value = "";
+    this.arr = [];
+    this.method = function(){   //splits elements at the operator and pushes the values and operators as separate elements into an array
+        for (let elem of str){
+            if(+elem || elem === "0" || elem === ".") {
+                this.value += elem
+            } else {
+                arr.push(this.value);
+                arr.push(this.elem);
+                val = "";
+            }
         }
+        if (value !== ""){
+            arr.push(this.value);
+            this.value = "";
+        }
+        return [this.value, this.arr];
     }
-    if (val !== ""){
-        arr.push(val);
-        val = "";
-    }
-    return [val, arr];
 }
 
 console.log();
