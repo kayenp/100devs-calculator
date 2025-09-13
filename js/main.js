@@ -70,7 +70,7 @@ let calculator = new function(){
             return arr;
         } else {
             for (let i = 0; i < arr.length; i++){
-                if (arr[i] === "+"){
+                if (arr[i] === "+                     "){
                     console.log(+arr[i-1] + +arr[i+1]);
                     return +arr[i-1] + +arr[i+1];
                 }
