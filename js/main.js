@@ -45,45 +45,53 @@ let btnElem = Array.from(document.querySelectorAll(".btn"));
 let btnTxt = btnElem.map((elem) => elem.innerText);
 
 //adds an event listener to each button
-(function() {
-    for(let elem of btnElem){
-        elem.addEventListener("click", (() => {}));
-    }
-})();
-
-(function() {
-    for(let elem of btnElem){
-        console.log(+elem.innerText)
-        if(+elem.innerText){
-            elem.addEventListener("click", storeNumValue);
-        };
-    }
-})();
-
 function storeNumValue(){
-    calculator.value += this.innerText;
-    console.log(calculator.value)
+    calculator.value += this.innerText; //<---- this doubles up on calculator.value
+    console.log(calculator.value, calculator.arr)
+}
+
+function calculate(){
+    calculator.toArr()
 }
 
 let calculator = new function(){
-    this.value = "";
-    this.arr = [];
-    this.method = function(){   //splits elements at the operator and pushes the values and operators as separate elements into an array
-        for (let elem of str){
-            if(+elem || elem === "0" || elem === ".") {
-                this.value += elem
-            } else {
-                arr.push(this.value);
-                arr.push(this.elem);
-                val = "";
+    this.value = ""; 
+    this.arr = []; //<--- need a function to pass value into this when equal button is pressed
+    this.toArr = function(){   
+        this.arr =  this.value.split(/([0-9]+)/).filter((elem) => elem !== ""); //splits value at the operator, outputs to new array, deletes empty ""
+        this.value = "";
+        console.log(this.arr);
+        this.toOperate(this.arr);
+    };
+    this.toOperate = function(arr){
+        console.log(arr.length, arr);
+        if(arr.length === 1){
+            console.log(arr, "This array is done");
+            return arr;
+        } else {
+            for (let i = 0; i < arr.length; i++){
+                if (arr[i] === "+"){
+                    console.log(+arr[i-1] + +arr[i+1]);
+                    return +arr[i-1] + +arr[i+1];
+                }
             }
         }
-        if (value !== ""){
-            arr.push(this.value);
-            this.value = "";
-        }
-        return [this.value, this.arr];
     }
-}
+};
 
-console.log();
+(function() {
+    for(let elem of btnElem){
+        if(elem.innerText !== "="){
+            elem.addEventListener("click", storeNumValue);
+        };
+    };
+})();
+
+(function() {
+    for(let elem of btnElem){
+        if(elem.innerText === "="){
+            elem.addEventListener("click", calculate); //<--- double check this is working
+        };
+    };
+})();
+
