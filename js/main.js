@@ -60,36 +60,56 @@ let calculator = new function(){
     this.toArr = function(){   
         this.arr =  this.value.split(/([0-9]+)/).filter((elem) => elem !== ""); //splits value at the operator, outputs to new array, deletes empty ""
         this.value = "";
-        console.log(this.arr);
         this.toOperate(this.arr);
     };
+    this.insertResults = function(pos, result){ //inserts results from operator functions into array and returns array to method for re-evaluation
+        this.arr.splice(pos,3,result);
+        calculator.toOperate(this.arr);
+    }
     this.toOperate = function(arr){
-        console.log(arr.length, arr);
-        if(arr.length === 1){
+        if(arr.length <= 1){
             console.log(arr, "This array is done");
             return arr;
         } else {
-            for (let i = 0; i < arr.length; i++){
-                let prevInd = arr[i-1];
-                let nextInd = arr[i+1];
-                switch(arr[i]){
-                    case "+":
-                        (function(){
-                            insertResults(+prevInd + +nextInd);
-                        })();
-                        break;
-                    case "-":
-                        (function(){
-                            insertResults(Number(prevInd) - Number(nextInd));
-                        })();
-                        break;
-                };
-                function insertResults(result){ //inserts results from operator functions into array and returns array to method for re-evaluation
-                    arr.splice((i-1),3,result);
-                    calculator.toOperate(arr);
+            //for (let h = 0; h <= 1; h++){
+                for (let i = 0; i < arr.length; i++){
+                    let prevInd = arr[i-1];
+                    let nextInd = arr[i+1];
+                    //if (h < 1){
+                        switch(arr[i]){
+                            case "*":
+                                (() => {
+                                    let result = +prevInd * +nextInd
+                                    calculator.insertResults(calculator.arr.indexOf(arr[i-1]), result);
+                                })();
+                                break;
+                            case "/":
+                                (() => {
+                                    let result = Number(prevInd) / Number(nextInd);
+                                    calculator.insertResults(calculator.arr.indexOf(arr[i-1]), result);
+                                })();
+                                break;
+                        }
+                    //} else {
+                        switch(arr[i]){
+                            case "+":
+                                (() => {
+                                    let result = +prevInd + +nextInd;
+                                    calculator.insertResults(calculator.arr.indexOf(arr[i-1]), result);
+                                })();
+                                break;
+                            case "-":
+                                (() => {
+                                    let result = Number(prevInd) - Number(prevInd);
+                                    calculator.insertResults(calculator.arr.indexOf(arr[i-1]), result);
+                                })();
+                                break;
+                        }
+                    //};
                 }
-            }
+            //}
         }
+        return arr;
     }
 };
 
