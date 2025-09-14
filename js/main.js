@@ -130,3 +130,13 @@ let calculator = new function(){
 })();
 
 
+const cards = ['diamond', 'spade', 'heart', 'club'];
+
+// Write your code below
+
+let currentCard;
+
+console.log(typeof currentCard);
+while(currentCard !== "spade"){
+  currentCard = cards[Math.floor(Math.random() * 4)];
+}
