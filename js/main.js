@@ -70,9 +70,23 @@ let calculator = new function(){
             return arr;
         } else {
             for (let i = 0; i < arr.length; i++){
-                if (arr[i] === "+                     "){
-                    console.log(+arr[i-1] + +arr[i+1]);
-                    return +arr[i-1] + +arr[i+1];
+                let prevInd = arr[i-1];
+                let nextInd = arr[i+1];
+                switch(arr[i]){
+                    case "+":
+                        (function(){
+                            insertResults(+prevInd + +nextInd);
+                        })();
+                        break;
+                    case "-":
+                        (function(){
+                            insertResults(Number(prevInd) - Number(nextInd));
+                        })();
+                        break;
+                };
+                function insertResults(result){ //inserts results from operator functions into array and returns array to method for re-evaluation
+                    arr.splice((i-1),3,result);
+                    calculator.toOperate(arr);
                 }
             }
         }
@@ -94,4 +108,5 @@ let calculator = new function(){
         };
     };
 })();
+
 
