@@ -43,15 +43,32 @@ PLAN
 
 let btnElem = Array.from(document.querySelectorAll(".btn"));
 let btnTxt = btnElem.map((elem) => elem.innerText);
+let calcDisplay = document.querySelector(".div-output");
 
-//adds an event listener to each button
+//bound to each button except "="
 function storeNumValue(){
-    calculator.value += this.innerText; //<---- this doubles up on calculator.value
+    calculator.value += this.innerText; //adds pressed input value to calculator.value
     console.log(calculator.value, calculator.arr)
 }
 
-function calculate(){  //bound to "=" to being calculation output
+//bound only to "=", begins calculating result
+function calculate(){  
     calculator.toArr() //passes calculator.value to calculator.toArr for conversion of string to array with each group of numbers and each operator in a separate element
+}
+
+//bound to each button except "="
+function outputDisplay(){
+    let pattern = /[\+\-\*\/]/;
+    if(Number(this.innerText)){
+        calcDisplay.innerText += this.innerText
+    } else if(pattern.test(this.innerText)){
+        if(!pattern.test(calcDisplay.innerText.slice(-1))){
+            calcDisplay.innerText += this.innerText;
+        } else {
+            calcDisplay.innerText = calcDisplay.innerText.slice(0,-1) + this.innerText;
+            calculator.value = calcDisplay.innerText.slice(0,-1); //<-----double inputs, shouldn't change value or combine w/ storeNumVal
+        }
+    };  //needs to log input values first before checking; numbers added automatically, operators check for last displayed value
 }
 
 let calculator = new function(){ //this is an object
@@ -67,10 +84,10 @@ let calculator = new function(){ //this is an object
         calculator.toOperate(this.arr);
     }
     this.toOperate = function(arr){
-        for(let h = 0; h <= 1; h++){ //loop to evaluate * & / switch statements on 1st pass, + & - on 2nd pass
+        for(let h = 0; h <= 1; h++){    //loop to evaluate * & / switch statements on 1st pass, + & - on 2nd pass
             evalArr(h);
         }
-        function evalArr(index){//evaluation function for symbols in array, recursively returns until array.length value = 1
+        function evalArr(index){    //evaluation function for symbols in array, recursively returns until array.length value = 1
             if(arr.length <= 1){
                 console.log(arr, "This array is done");
                 return arr;
@@ -111,10 +128,18 @@ let calculator = new function(){ //this is an object
                         };                           
                     }           
             }
-            return arr
+            return calcDisplay.innerText = arr.join("");
         };
     }
 };
+
+(function() {
+    for(let elem of btnElem){
+        if(elem.innerText !== "="){
+            elem.addEventListener("click", outputDisplay);
+        };
+    };
+})();
 
 (function() {
     for(let elem of btnElem){
@@ -131,4 +156,6 @@ let calculator = new function(){ //this is an object
         };
     };
 })();
+
+
 
