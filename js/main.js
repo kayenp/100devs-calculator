@@ -44,6 +44,7 @@ PLAN
 let btnElem = Array.from(document.querySelectorAll(".btn"));
 let btnTxt = btnElem.map((elem) => elem.innerText);
 let calcDisplay = document.querySelector(".div-output");
+let pattern = /[\+\-\*\/]/;
 
 //bound to each button except "="
 function storeNumValue(){
@@ -52,23 +53,28 @@ function storeNumValue(){
 }
 
 //bound only to "=", begins calculating result
-function calculate(){  
+function calculate(){
+    console.log((calcDisplay.innerText.slice(0,-1)));  
+    if(pattern.test(calcDisplay.innerText.slice(-1))){
+        calcDisplay.innerText = calcDisplay.innerText.slice(0,-1);
+        calculator.value = calcDisplay.innerText;
+    }
+    console.log(calcDisplay.innerText, calculator.value, calculator.arr)                   
     calculator.toArr() //passes calculator.value to calculator.toArr for conversion of string to array with each group of numbers and each operator in a separate element
-}
+}                      
 
 //bound to each button except "="
 function outputDisplay(){
-    let pattern = /[\+\-\*\/]/;
     if(Number(this.innerText)){
         calcDisplay.innerText += this.innerText
-    } else if(pattern.test(this.innerText)){
+    } else {  
         if(!pattern.test(calcDisplay.innerText.slice(-1))){
             calcDisplay.innerText += this.innerText;
         } else {
             calcDisplay.innerText = calcDisplay.innerText.slice(0,-1) + this.innerText;
-            calculator.value = calcDisplay.innerText.slice(0,-1); //<-----double inputs, shouldn't change value or combine w/ storeNumVal
+            calculator.value = calcDisplay.innerText.slice(0,-1); 
         }
-    };  //needs to log input values first before checking; numbers added automatically, operators check for last displayed value
+    };  
 }
 
 let calculator = new function(){ //this is an object
