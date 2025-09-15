@@ -50,66 +50,69 @@ function storeNumValue(){
     console.log(calculator.value, calculator.arr)
 }
 
-function calculate(){
-    calculator.toArr()
+function calculate(){  //bound to "=" to being calculation output
+    calculator.toArr() //passes calculator.value to calculator.toArr for conversion of string to array with each group of numbers and each operator in a separate element
 }
 
-let calculator = new function(){
+let calculator = new function(){ //this is an object
     this.value = ""; 
     this.arr = []; //<--- need a function to pass value into this when equal button is pressed
     this.toArr = function(){   
         this.arr =  this.value.split(/([0-9]+)/).filter((elem) => elem !== ""); //splits value at the operator, outputs to new array, deletes empty ""
         this.value = "";
-        this.toOperate(this.arr);
+        this.toOperate(this.arr); //begins evaluation of array elements for result
     };
-    this.insertResults = function(pos, result){ //inserts results from operator functions into array and returns array to method for re-evaluation
+    this.insertResults = function(pos, result){ //inserts results from evalArr() into array and then recurses toOperate();
         this.arr.splice(pos,3,result);
         calculator.toOperate(this.arr);
     }
     this.toOperate = function(arr){
-        if(arr.length <= 1){
-            console.log(arr, "This array is done");
-            return arr;
-        } else {
-            //for (let h = 0; h <= 1; h++){
-                for (let i = 0; i < arr.length; i++){
-                    let prevInd = arr[i-1];
-                    let nextInd = arr[i+1];
-                    //if (h < 1){
-                        switch(arr[i]){
-                            case "*":
-                                (() => {
-                                    let result = +prevInd * +nextInd
-                                    calculator.insertResults(calculator.arr.indexOf(arr[i-1]), result);
-                                })();
-                                break;
-                            case "/":
-                                (() => {
-                                    let result = Number(prevInd) / Number(nextInd);
-                                    calculator.insertResults(calculator.arr.indexOf(arr[i-1]), result);
-                                })();
-                                break;
-                        }
-                    //} else {
-                        switch(arr[i]){
-                            case "+":
-                                (() => {
-                                    let result = +prevInd + +nextInd;
-                                    calculator.insertResults(calculator.arr.indexOf(arr[i-1]), result);
-                                })();
-                                break;
-                            case "-":
-                                (() => {
-                                    let result = Number(prevInd) - Number(prevInd);
-                                    calculator.insertResults(calculator.arr.indexOf(arr[i-1]), result);
-                                })();
-                                break;
-                        }
-                    //};
-                }
-            //}
+        for(let h = 0; h <= 1; h++){ //loop to evaluate * & / switch statements on 1st pass, + & - on 2nd pass
+            evalArr(h);
         }
-        return arr;
+        function evalArr(index){//evaluation function for symbols in array, recursively returns until array.length value = 1
+            if(arr.length <= 1){
+                console.log(arr, "This array is done");
+                return arr;
+            } else {
+                    for (let i = 0; i < arr.length; i++){
+                        let prevInd = arr[i-1];
+                        let nextInd = arr[i+1];
+                        if (index < 1){
+                            switch(arr[i]){
+                                case "*":
+                                    (() => {
+                                        let result = +prevInd * +nextInd
+                                        calculator.insertResults(calculator.arr.indexOf(arr[i-1]), result);
+                                    })();
+                                    break;
+                                case "/":
+                                    (() => {
+                                        let result = Number(prevInd) / Number(nextInd);
+                                        calculator.insertResults(calculator.arr.indexOf(arr[i-1]), result);
+                                    })();
+                                    break;
+                            }
+                        } else {
+                            switch(arr[i]){
+                                case "+":
+                                    (() => {
+                                        let result = +prevInd + +nextInd;
+                                        calculator.insertResults(calculator.arr.indexOf(arr[i-1]), result);
+                                    })();
+                                    break;
+                                case "-":
+                                    (() => {
+                                        let result = Number(prevInd) - Number(prevInd);
+                                        calculator.insertResults(calculator.arr.indexOf(arr[i-1]), result);
+                                    })();
+                                    break;
+                            }
+                        };                           
+                    }           
+            }
+            return arr
+        };
     }
 };
 
@@ -129,14 +132,3 @@ let calculator = new function(){
     };
 })();
 
-
-const cards = ['diamond', 'spade', 'heart', 'club'];
-
-// Write your code below
-
-let currentCard;
-
-console.log(typeof currentCard);
-while(currentCard !== "spade"){
-  currentCard = cards[Math.floor(Math.random() * 4)];
-}
