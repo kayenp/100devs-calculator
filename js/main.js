@@ -37,8 +37,11 @@ PLAN
     Possible solutions:
 
     Thoughts: 
-        - btn elem text to set property names?
-        - what happens when i attach event listener to elem inner text?
+        - clear display on new calculation
+        - allow for "-" in front of numbers for negative numbers
+        - +, -, *, / don't overwrite decimel and vice versa
+        - refactor into OOP
+        
 */
 
 let btnElem = Array.from(document.querySelectorAll(".btn"));
@@ -73,13 +76,13 @@ function outputDisplay(){
         } else {
             calcDisplay.innerText = calcDisplay.innerText.slice(0,-1) + this.innerText;
             calculator.value = calcDisplay.innerText.slice(0,-1); 
-        }
+        };
     };  
 }
 
 let calculator = new function(){ //this is an object
     this.value = ""; 
-    this.arr = []; //<--- need a function to pass value into this when equal button is pressed
+    this.arr = []; 
     this.toArr = function(){   
         this.arr =  this.value.split(/([0-9]+)/).filter((elem) => elem !== ""); //splits value at the operator, outputs to new array, deletes empty ""
         this.value = "";
@@ -158,7 +161,7 @@ let calculator = new function(){ //this is an object
 (function() {
     for(let elem of btnElem){
         if(elem.innerText === "="){
-            elem.addEventListener("click", calculate); //<--- double check this is working
+            elem.addEventListener("click", calculate); 
         };
     };
 })();
