@@ -37,17 +37,17 @@ PLAN
     Possible solutions:
 
     Thoughts: 
-        - clear display on new calculation
+        - 
         - allow for "-" in front of numbers for negative numbers
         - +, -, *, / don't overwrite decimel and vice versa
         - refactor into OOP
         
 */
-
 let btnElem = Array.from(document.querySelectorAll(".btn"));
 let btnTxt = btnElem.map((elem) => elem.innerText);
 let calcDisplay = document.querySelector(".div-output");
 let pattern = /[\+\-\*\/]/;
+let prevCalc = false;
 
 //bound to each button except "="
 function storeNumValue(){
@@ -60,14 +60,21 @@ function calculate(){
     console.log((calcDisplay.innerText.slice(0,-1)));  
     if(pattern.test(calcDisplay.innerText.slice(-1))){
         calcDisplay.innerText = calcDisplay.innerText.slice(0,-1);
+        console.log(calcDisplay.innerText, "calcdisplay innertext");
         calculator.value = calcDisplay.innerText;
     }
-    console.log(calcDisplay.innerText, calculator.value, calculator.arr)                   
+    console.log(calcDisplay.innerText, "calcdisplay innertext")
+    console.log(calculator.value, "calculator value")                   
     calculator.toArr() //passes calculator.value to calculator.toArr for conversion of string to array with each group of numbers and each operator in a separate element
+    prevCalc = true;
 }                      
 
 //bound to each button except "="
 function outputDisplay(){
+    if (prevCalc === true){
+        calcDisplay.innerText = "";
+        prevCalc = false;
+    }
     if(Number(this.innerText)){
         calcDisplay.innerText += this.innerText
     } else {  
@@ -82,21 +89,30 @@ function outputDisplay(){
 
 let calculator = new function(){ //this is an object
     this.value = ""; 
-    this.arr = []; 
+    this.arr = [];
+
+    //splits value at the operator, outputs to new array, deletes empty ""
     this.toArr = function(){   
-        this.arr =  this.value.split(/([0-9]+)/).filter((elem) => elem !== ""); //splits value at the operator, outputs to new array, deletes empty ""
+        this.arr =  this.value.split(/([0-9]+)/).filter((elem) => elem !== "");
+        console.log(this.arr, "calculator array"); 
         this.value = "";
         this.toOperate(this.arr); //begins evaluation of array elements for result
     };
-    this.insertResults = function(pos, result){ //inserts results from evalArr() into array and then recurses toOperate();
+
+    //inserts results from evalArr() into array and then recurses toOperate();
+    this.insertResults = function(pos, result){ 
         this.arr.splice(pos,3,result);
         calculator.toOperate(this.arr);
-    }
+    };
+
+    //loop to evaluate * & / switch statements on 1st pass, + & - on 2nd pass
     this.toOperate = function(arr){
-        for(let h = 0; h <= 1; h++){    //loop to evaluate * & / switch statements on 1st pass, + & - on 2nd pass
+        for(let h = 0; h <= 1; h++){    
             evalArr(h);
         }
-        function evalArr(index){    //evaluation function for symbols in array, recursively returns until array.length value = 1
+
+        //evaluation function for symbols in array, recursively returns until array.length value = 1
+        function evalArr(index){    
             if(arr.length <= 1){
                 console.log(arr, "This array is done");
                 return arr;
@@ -108,6 +124,7 @@ let calculator = new function(){ //this is an object
                             switch(arr[i]){
                                 case "*":
                                     (() => {
+                                        console.log(`+${prevInd} * +${nextInd}`);
                                         let result = +prevInd * +nextInd
                                         calculator.insertResults(calculator.arr.indexOf(arr[i-1]), result);
                                     })();
@@ -129,7 +146,9 @@ let calculator = new function(){ //this is an object
                                     break;
                                 case "-":
                                     (() => {
-                                        let result = Number(prevInd) - Number(prevInd);
+                                        console.log(`${Number(prevInd)} - ${Number(nextInd)}`)
+                                        let result = Number(prevInd) - Number(nextInd);
+                                        console.log(result);
                                         calculator.insertResults(calculator.arr.indexOf(arr[i-1]), result);
                                     })();
                                     break;
