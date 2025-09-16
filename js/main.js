@@ -37,11 +37,9 @@ PLAN
     Possible solutions:
 
     Thoughts: 
-        - 
         - allow for "-" in front of numbers for negative numbers
-        - +, -, *, / don't overwrite decimel and vice versa
+        - 0 as first digit calcDisplay shouldn't be shown?
         - refactor into OOP
-        
 */
 let btnElem = Array.from(document.querySelectorAll(".btn"));
 let btnTxt = btnElem.map((elem) => elem.innerText);
@@ -71,29 +69,30 @@ function calculate(){
 
 //bound to each button except "="
 function outputDisplay(){
-    if (prevCalc === true){
+    if (prevCalc === true){ //resets calcDisplay for new calculation 
         calcDisplay.innerText = "";
         prevCalc = false;
     }
-    if(Number(this.innerText)){
+    if(Number(this.innerText) || (this.innerText === "0") || ((this.innerText === "."))){ //if input is a number, adds to calcDisplay
         calcDisplay.innerText += this.innerText
-    } else {  
-        if(!pattern.test(calcDisplay.innerText.slice(-1))){
-            calcDisplay.innerText += this.innerText;
-        } else {
-            calcDisplay.innerText = calcDisplay.innerText.slice(0,-1) + this.innerText;
+    } else {                    //if input is not a number
+        if(!pattern.test(calcDisplay.innerText.slice(-1)) && (calcDisplay.innerText.slice(-1) !== ".")){  //checks if last character stored on calcDisplay is *not* an operator
+            calcDisplay.innerText += this.innerText;            //then add input (non-number character)
+        } else {                                                                        //otherwise
+            calcDisplay.innerText = calcDisplay.innerText.slice(0,-1) + this.innerText; //replace last character on calcDisplay with input ()
             calculator.value = calcDisplay.innerText.slice(0,-1); 
         };
     };  
 }
 
-let calculator = new function(){ //this is an object
+//this is an object
+let calculator = new function(){ 
     this.value = ""; 
     this.arr = [];
 
     //splits value at the operator, outputs to new array, deletes empty ""
     this.toArr = function(){   
-        this.arr =  this.value.split(/([0-9]+)/).filter((elem) => elem !== "");
+        this.arr =  this.value.split(/([0-9\.]+)/).filter((elem) => elem !== "");
         console.log(this.arr, "calculator array"); 
         this.value = "";
         this.toOperate(this.arr); //begins evaluation of array elements for result
