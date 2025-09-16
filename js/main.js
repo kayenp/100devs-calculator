@@ -37,10 +37,11 @@ PLAN
     Possible solutions:
 
     Thoughts: 
+        - checks that first input is only a number, decimal or "-"
+            ^^^
         - allow for "-" in front of numbers for negative numbers
             ^^^need to also change how arrays are split
-            
-        - 0 as first digit calcDisplay shouldn't be shown?
+        - replace indexOf to find array position
         - refactor into OOP
 */
 let btnElem = Array.from(document.querySelectorAll(".btn"));
@@ -76,15 +77,21 @@ function outputDisplay(){
         prevCalc = false;
     }
     if(!isNaN(+this.innerText) || ((this.innerText === "."))){ //if input is a number or decimal, adds to calcDisplay
-        if(calcDisplay.innerText.slice(-1) === "0" && calcDisplay.innerText.length === 1){
+        if(calcDisplay.innerText.length === 1){ 
+            if(calcDisplay.innerText === "0" || calcDisplay.innerText === "+" || calcDisplay.innerText === "*" || calcDisplay.innerText === "/"){
             calcDisplay.innerText = this.innerText;
+            calculator.value = ""; 
+            } else {
+                calcDisplay.innerText += this.innerText;
+            }
         } else {
         calcDisplay.innerText += this.innerText;
         };
     } else {                    //if input is not a number
-        if(!pattern.test(calcDisplay.innerText.slice(-1)) && (calcDisplay.innerText.slice(-1) !== ".")){  //checks if last character stored on calcDisplay is *not* an operator
-            calcDisplay.innerText += this.innerText;                                    //then add input (non-number character)
-        } else {                                                                        //otherwise
+        if((!pattern.test(calcDisplay.innerText.slice(-1)) && (calcDisplay.innerText.slice(-1) !== ".")) || ((calcDisplay.innerText.length === 0 && this.innerText === "-"))){  //checks if last character stored on calcDisplay is *not* an operator and not a decimal
+            calcDisplay.innerText += this.innerText;                    //then add input (non-number character)
+        } 
+        else {                                                                        //otherwise
             calcDisplay.innerText = calcDisplay.innerText.slice(0,-1) + this.innerText; //replace last character on calcDisplay with input ()
             calculator.value = calcDisplay.innerText.slice(0,-1); 
         };
@@ -105,8 +112,10 @@ let calculator = new function(){
     };
 
     //inserts results from evalArr() into array and then recurses toOperate();
-    this.insertResults = function(pos, result){ 
+    this.insertResults = function(pos, result){
+        console.log(result) 
         this.arr.splice(pos,3,result);
+        console.log(this.arr)
         calculator.toOperate(this.arr);
     };
 
@@ -125,13 +134,20 @@ let calculator = new function(){
                     for (let i = 0; i < arr.length; i++){
                         let prevInd = arr[i-1];
                         let nextInd = arr[i+1];
-                        if (index < 1){
+
+                        if (index < 1){  //index refers to toOperate for...h loop
+
                             switch(arr[i]){
                                 case "*":
                                     (() => {
-                                        console.log(`+${prevInd} * +${nextInd}`);
-                                        let result = +prevInd * +nextInd
-                                        calculator.insertResults(calculator.arr.indexOf(arr[i-1]), result);
+                                        console.log(`${prevInd} * ${nextInd}`);
+                                        let result = Number(prevInd) * Number(nextInd);
+                                        console.log(result)
+                                        //calculator.insertResults(calculator.arr.indexOf(arr[i-1]), result); //using indexOf can have screwy results because it finds first index position, so double value in exprression will have wrong position
+                                        console.log(prevInd, arr[i], i)
+                                        console.log(arr);
+                                        console.log(arr.splice(arr[i-2],3,result));
+                                        calculator.toOperate(arr.splice(arr[i-2],3,result));
                                     })();
                                     break;
                                 case "/":
