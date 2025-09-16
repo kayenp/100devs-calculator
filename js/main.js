@@ -38,6 +38,8 @@ PLAN
 
     Thoughts: 
         - allow for "-" in front of numbers for negative numbers
+            ^^^need to also change how arrays are split
+            
         - 0 as first digit calcDisplay shouldn't be shown?
         - refactor into OOP
 */
@@ -73,11 +75,15 @@ function outputDisplay(){
         calcDisplay.innerText = "";
         prevCalc = false;
     }
-    if(Number(this.innerText) || (this.innerText === "0") || ((this.innerText === "."))){ //if input is a number, adds to calcDisplay
-        calcDisplay.innerText += this.innerText
+    if(typeof +this.innerText === "number" || ((this.innerText === "."))){ //if input is a number or decimal, adds to calcDisplay
+        if(calcDisplay.innerText.slice(-1) === "0" && calcDisplay.innerText.length === 1){
+            calcDisplay.innerText = this.innerText;
+        } else {
+        calcDisplay.innerText += this.innerText;
+        };
     } else {                    //if input is not a number
         if(!pattern.test(calcDisplay.innerText.slice(-1)) && (calcDisplay.innerText.slice(-1) !== ".")){  //checks if last character stored on calcDisplay is *not* an operator
-            calcDisplay.innerText += this.innerText;            //then add input (non-number character)
+            calcDisplay.innerText += this.innerText;                                    //then add input (non-number character)
         } else {                                                                        //otherwise
             calcDisplay.innerText = calcDisplay.innerText.slice(0,-1) + this.innerText; //replace last character on calcDisplay with input ()
             calculator.value = calcDisplay.innerText.slice(0,-1); 
