@@ -75,7 +75,7 @@ function outputDisplay(){
         calcDisplay.innerText = "";
         prevCalc = false;
     }
-    if(typeof +this.innerText === "number" || ((this.innerText === "."))){ //if input is a number or decimal, adds to calcDisplay
+    if(!isNaN(+this.innerText) || ((this.innerText === "."))){ //if input is a number or decimal, adds to calcDisplay
         if(calcDisplay.innerText.slice(-1) === "0" && calcDisplay.innerText.length === 1){
             calcDisplay.innerText = this.innerText;
         } else {
