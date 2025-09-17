@@ -41,14 +41,23 @@ PLAN
             ^^^
         - allow for "-" in front of numbers for negative numbers
             ^^^need to also change how arrays are split
-        - replace indexOf to find array position
+        - replace indexOf to find array position; indexOf returns wrong array position
         - refactor into OOP
+        - use endsWith() on strings
+        - use loop to add spaces between string characters to then split into array (replaces regex)
+        - findIndex() using index position of before & after elements???
+        - concat() to concatanate elements in operation???
+        - spread syntax to 
 */
 let btnElem = Array.from(document.querySelectorAll(".btn"));
 let btnTxt = btnElem.map((elem) => elem.innerText);
 let calcDisplay = document.querySelector(".div-output");
 let pattern = /[\+\-\*\/]/;
 let prevCalc = false;
+
+function thisIndex(prev, next){
+
+}
 
 //bound to each button except "="
 function storeNumValue(){
@@ -88,7 +97,7 @@ function outputDisplay(){
         calcDisplay.innerText += this.innerText;
         };
     } else {                    //if input is not a number
-        if((!pattern.test(calcDisplay.innerText.slice(-1)) && (calcDisplay.innerText.slice(-1) !== ".")) || ((calcDisplay.innerText.length === 0 && this.innerText === "-"))){  //checks if last character stored on calcDisplay is *not* an operator and not a decimal
+        if((!pattern.test(calcDisplay.innerText.slice(-1)) && (!calcDisplay.innerText.endsWith("."))) || ((calcDisplay.innerText.length === 0 && this.innerText === "-"))){  //checks if last character stored on calcDisplay is *not* an operator and not a decimal
             calcDisplay.innerText += this.innerText;                    //then add input (non-number character)
         } 
         else {                                                                        //otherwise
@@ -113,47 +122,42 @@ let calculator = new function(){
 
     //inserts results from evalArr() into array and then recurses toOperate();
     this.insertResults = function(pos, result){
-        console.log(result) 
         this.arr.splice(pos,3,result);
-        console.log(this.arr)
         calculator.toOperate(this.arr);
     };
 
     //loop to evaluate * & / switch statements on 1st pass, + & - on 2nd pass
     this.toOperate = function(arr){
-        for(let h = 0; h <= 1; h++){    
-            evalArr(h);
+        for(let hIteration = 0; hIteration <= 1; hIteration++){    
+            evalArr(hIteration, arr);
         }
 
         //evaluation function for symbols in array, recursively returns until array.length value = 1
-        function evalArr(index){    
+        function evalArr(hIteration, arr){    
             if(arr.length <= 1){
                 console.log(arr, "This array is done");
                 return arr;
             } else {
                     for (let i = 0; i < arr.length; i++){
-                        let prevInd = arr[i-1];
+                        let prevInd = arr[i-1]; //returns element value, NOT index position
                         let nextInd = arr[i+1];
 
-                        if (index < 1){  //index refers to toOperate for...h loop
+                        if (hIteration < 1){  //index refers to toOperate for...h loop
 
                             switch(arr[i]){
                                 case "*":
                                     (() => {
-                                        console.log(`${prevInd} * ${nextInd}`);
                                         let result = Number(prevInd) * Number(nextInd);
-                                        console.log(result)
                                         //calculator.insertResults(calculator.arr.indexOf(arr[i-1]), result); //using indexOf can have screwy results because it finds first index position, so double value in exprression will have wrong position
-                                        console.log(prevInd, arr[i], i)
-                                        console.log(arr);
-                                        console.log(arr.splice(arr[i-2],3,result));
-                                        calculator.toOperate(arr.splice(arr[i-2],3,result));
+                                        console.log(arr, prevInd, i) 
+                                        calculator.toOperate(calculator.arr.splice((i-1), 3, result)); //FIXED!
+                                        console.log(calculator.arr)
                                     })();
                                     break;
                                 case "/":
                                     (() => {
                                         let result = Number(prevInd) / Number(nextInd);
-                                        calculator.insertResults(calculator.arr.indexOf(arr[i-1]), result);
+                                        calculator.insertResults((i-1), result); //ALSO FIXED!
                                     })();
                                     break;
                             }
@@ -162,7 +166,7 @@ let calculator = new function(){
                                 case "+":
                                     (() => {
                                         let result = +prevInd + +nextInd;
-                                        calculator.insertResults(calculator.arr.indexOf(arr[i-1]), result);
+                                        calculator.insertResults((i-1), result);
                                     })();
                                     break;
                                 case "-":
@@ -170,7 +174,7 @@ let calculator = new function(){
                                         console.log(`${Number(prevInd)} - ${Number(nextInd)}`)
                                         let result = Number(prevInd) - Number(nextInd);
                                         console.log(result);
-                                        calculator.insertResults(calculator.arr.indexOf(arr[i-1]), result);
+                                        calculator.insertResults((i-1), result);
                                     })();
                                     break;
                             }
