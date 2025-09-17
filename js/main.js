@@ -3,10 +3,15 @@
 /*
 PLAN
     I. CONSTRAINTS  
-        A. Must output to display
+        A. First non-number digit can be "-" or "."
+            1. Prevent non-digit other than "-" or "." from being first character in calcDisplay
+            2. If "-", need to concatenate to next digit value
+                i. If "-", needs to also be able to be overwritten by operator
+            3. If ".", needs to also be able to be overwritten by operator
 
     II. OPERATIONS
-
+        A. "-" overwritten by operator or "."
+            1. Inputting "-" checks if calcDisplay is empty
 
     III. GOAL(S)
         
@@ -38,26 +43,17 @@ PLAN
 
     Thoughts: 
         - checks that first input is only a number, decimal or "-"
-            ^^^
+            ^^^will also need to apply "-" as -1 * elem if starting with negative value
         - allow for "-" in front of numbers for negative numbers
-            ^^^need to also change how arrays are split
-        - replace indexOf to find array position; indexOf returns wrong array position
+            ^^^need to also change how arrays are split ???
         - refactor into OOP
-        - use endsWith() on strings
-        - use loop to add spaces between string characters to then split into array (replaces regex)
-        - findIndex() using index position of before & after elements???
-        - concat() to concatanate elements in operation???
-        - spread syntax to 
+        
 */
 let btnElem = Array.from(document.querySelectorAll(".btn"));
 let btnTxt = btnElem.map((elem) => elem.innerText);
 let calcDisplay = document.querySelector(".div-output");
 let pattern = /[\+\-\*\/]/;
 let prevCalc = false;
-
-function thisIndex(prev, next){
-
-}
 
 //bound to each button except "="
 function storeNumValue(){
@@ -66,37 +62,32 @@ function storeNumValue(){
 }
 
 //bound only to "=", begins calculating result
-function calculate(){
-    console.log((calcDisplay.innerText.slice(0,-1)));  
+function calculate(){ 
     if(pattern.test(calcDisplay.innerText.slice(-1))){
         calcDisplay.innerText = calcDisplay.innerText.slice(0,-1);
-        console.log(calcDisplay.innerText, "calcdisplay innertext");
         calculator.value = calcDisplay.innerText;
-    }
-    console.log(calcDisplay.innerText, "calcdisplay innertext")
-    console.log(calculator.value, "calculator value")                   
+    }             
     calculator.toArr() //passes calculator.value to calculator.toArr for conversion of string to array with each group of numbers and each operator in a separate element
     prevCalc = true;
 }                      
 
 //bound to each button except "="
+//outputs button presses to calcDisplay
 function outputDisplay(){
     if (prevCalc === true){ //resets calcDisplay for new calculation 
         calcDisplay.innerText = "";
         prevCalc = false;
     }
-    if(!isNaN(+this.innerText) || ((this.innerText === "."))){ //if input is a number or decimal, adds to calcDisplay
-        if(calcDisplay.innerText.length === 1){ 
-            if(calcDisplay.innerText === "0" || calcDisplay.innerText === "+" || calcDisplay.innerText === "*" || calcDisplay.innerText === "/"){
+    if(!isNaN(+this.innerText) || ((this.innerText === ".") || this.innerText === "-")){ //if input is a number or decimal, adds to calcDisplay
+                    //used to overwrite 0 or non-"-" as first character 
+        if((calcDisplay.innerText.length === 1) && (calcDisplay.innerText === "0" || calcDisplay.innerText === "+" || calcDisplay.innerText === "*" || calcDisplay.innerText === "/")){
             calcDisplay.innerText = this.innerText;
             calculator.value = ""; 
-            } else {
-                calcDisplay.innerText += this.innerText;
-            }
         } else {
         calcDisplay.innerText += this.innerText;
         };
-    } else {                    //if input is not a number
+      } else {
+        //if input is not a number
         if((!pattern.test(calcDisplay.innerText.slice(-1)) && (!calcDisplay.innerText.endsWith("."))) || ((calcDisplay.innerText.length === 0 && this.innerText === "-"))){  //checks if last character stored on calcDisplay is *not* an operator and not a decimal
             calcDisplay.innerText += this.innerText;                    //then add input (non-number character)
         } 
@@ -115,7 +106,6 @@ let calculator = new function(){
     //splits value at the operator, outputs to new array, deletes empty ""
     this.toArr = function(){   
         this.arr =  this.value.split(/([0-9\.]+)/).filter((elem) => elem !== "");
-        console.log(this.arr, "calculator array"); 
         this.value = "";
         this.toOperate(this.arr); //begins evaluation of array elements for result
     };
@@ -128,55 +118,53 @@ let calculator = new function(){
 
     //loop to evaluate * & / switch statements on 1st pass, + & - on 2nd pass
     this.toOperate = function(arr){
-        for(let hIteration = 0; hIteration <= 1; hIteration++){    
-            evalArr(hIteration, arr);
+        for(let h = 0; h <= 1; h++){    
+            evalArr(h, arr);
         }
 
         //evaluation function for symbols in array, recursively returns until array.length value = 1
-        function evalArr(hIteration, arr){    
+        function evalArr(h, arr){    
             if(arr.length <= 1){
                 console.log(arr, "This array is done");
                 return arr;
             } else {
-                    for (let i = 0; i < arr.length; i++){
-                        let prevInd = arr[i-1]; //returns element value, NOT index position
-                        let nextInd = arr[i+1];
+                if(arr[0] === "-") {
+                    arr.splice(0,2,(-arr[1]));
+                }
+                for (let i = 0; i < arr.length; i++){
+                    let prevInd = arr[i-1]; //returns element value, NOT index position
+                    let nextInd = arr[i+1];
 
-                        if (hIteration < 1){  //index refers to toOperate for...h loop
+                    if (h < 1){  //index refers to toOperate h loop
 
-                            switch(arr[i]){
-                                case "*":
-                                    (() => {
-                                        let result = Number(prevInd) * Number(nextInd);
-                                        //calculator.insertResults(calculator.arr.indexOf(arr[i-1]), result); //using indexOf can have screwy results because it finds first index position, so double value in exprression will have wrong position
-                                        console.log(arr, prevInd, i) 
-                                        calculator.toOperate(calculator.arr.splice((i-1), 3, result)); //FIXED!
-                                        console.log(calculator.arr)
-                                    })();
-                                    break;
-                                case "/":
-                                    (() => {
-                                        let result = Number(prevInd) / Number(nextInd);
-                                        calculator.insertResults((i-1), result); //ALSO FIXED!
-                                    })();
-                                    break;
-                            }
-                        } else {
-                            switch(arr[i]){
-                                case "+":
-                                    (() => {
-                                        let result = +prevInd + +nextInd;
-                                        calculator.insertResults((i-1), result);
-                                    })();
-                                    break;
-                                case "-":
-                                    (() => {
-                                        console.log(`${Number(prevInd)} - ${Number(nextInd)}`)
-                                        let result = Number(prevInd) - Number(nextInd);
-                                        console.log(result);
-                                        calculator.insertResults((i-1), result);
-                                    })();
-                                    break;
+                        switch(arr[i]){
+                            case "*":
+                                (() => {
+                                    let result = Number(prevInd) * Number(nextInd);
+                                    calculator.toOperate(calculator.arr.splice((i-1), 3, result)); //FIXED!
+                                })();
+                                break;
+                            case "/":
+                                (() => {
+                                    let result = Number(prevInd) / Number(nextInd);
+                                    calculator.insertResults((i-1), result); //ALSO FIXED!
+                                })();
+                                break;
+                        }
+                    } else {
+                        switch(arr[i]){
+                            case "+":
+                                (() => {
+                                    let result = +prevInd + +nextInd;
+                                    calculator.insertResults((i-1), result);
+                                })();
+                                break;
+                            case "-":
+                                (() => {
+                                    let result = Number(prevInd) - Number(nextInd);
+                                    calculator.insertResults((i-1), result);
+                                })();
+                                break;                                                                                  
                             }
                         };                           
                     }           
