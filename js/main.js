@@ -42,10 +42,6 @@ PLAN
     Possible solutions:
 
     Thoughts: 
-        - checks that first input is only a number, decimal or "-"
-            ^^^will also need to apply "-" as -1 * elem if starting with negative value
-        - allow for "-" in front of numbers for negative numbers
-            ^^^need to also change how arrays are split ???
         - refactor into OOP
         
 */
