@@ -48,79 +48,35 @@ PLAN
 let btnElem = Array.from(document.querySelectorAll(".btn"));
 let btnTxt = btnElem.map((elem) => elem.innerText);
 let calcDisplay = document.querySelector(".div-output");
-let pattern = /[\+\-\*\/]/;
-let prevCalc = false;
-
-//bound to each button except "="
-function storeNumValue(){
-    calculator.value += this.innerText; //adds pressed input value to calculator.value
-    console.log(calculator.value, calculator.arr)
-}
-
-//bound only to "=", begins calculating result
-function calculate(){ 
-    if(pattern.test(calcDisplay.innerText.slice(-1))){
-        calcDisplay.innerText = calcDisplay.innerText.slice(0,-1);
-        calculator.value = calcDisplay.innerText;
-    }             
-    calculator.toArr() //passes calculator.value to calculator.toArr for conversion of string to array with each group of numbers and each operator in a separate element
-    prevCalc = true;
-}                      
-
-//bound to each button except "="
-//outputs button presses to calcDisplay
-function outputDisplay(){
-    if (prevCalc === true){ //resets calcDisplay for new calculation 
-        calcDisplay.innerText = "";
-        prevCalc = false;
-    }
-    if(!isNaN(+this.innerText) || ((this.innerText === ".") || this.innerText === "-")){ //if input is a number or decimal, adds to calcDisplay
-                    //used to overwrite 0 or non-"-" as first character 
-        if((calcDisplay.innerText.length === 1) && (calcDisplay.innerText === "0" || calcDisplay.innerText === "+" || calcDisplay.innerText === "*" || calcDisplay.innerText === "/")){
-            calcDisplay.innerText = this.innerText;
-            calculator.value = ""; 
-        } else {
-        calcDisplay.innerText += this.innerText;
-        };
-      } else {
-        //if input is not a number
-        if((!pattern.test(calcDisplay.innerText.slice(-1)) && (!calcDisplay.innerText.endsWith("."))) || ((calcDisplay.innerText.length === 0 && this.innerText === "-"))){  //checks if last character stored on calcDisplay is *not* an operator and not a decimal
-            calcDisplay.innerText += this.innerText;                    //then add input (non-number character)
-        } 
-        else {                                                                        //otherwise
-            calcDisplay.innerText = calcDisplay.innerText.slice(0,-1) + this.innerText; //replace last character on calcDisplay with input ()
-            calculator.value = calcDisplay.innerText.slice(0,-1); 
-        };
-    };  
-}
 
 //this is an object
 let calculator = new function(){ 
-    this.value = ""; 
-    this.arr = [];
+    let storedValue = ""; 
+    let storedArr = [];
+    let prevCalc = false;
+    let pattern = /[\+\-\*\/]/;
 
     //splits value at the operator, outputs to new array, deletes empty ""
-    this.toArr = function(){   
-        this.arr =  this.value.split(/([0-9\.]+)/).filter((elem) => elem !== "");
-        this.value = "";
-        this.toOperate(this.arr); //begins evaluation of array elements for result
+    let toArr = function(){   
+        storedArr = storedValue.split(/([0-9\.]+)/).filter((elem) => elem !== "");
+        storedValue = "";
+        toOperate(storedArr); //begins evaluation of array elements for result
     };
 
     //inserts results from evalArr() into array and then recurses toOperate();
-    this.insertResults = function(pos, result){
-        this.arr.splice(pos,3,result);
-        calculator.toOperate(this.arr);
+    let insertResults = function(pos, result){
+        storedArr.splice(pos,3,result);
+        toOperate(storedArr);
     };
 
     //loop to evaluate * & / switch statements on 1st pass, + & - on 2nd pass
-    this.toOperate = function(arr){
+    let toOperate = function(arr){
         for(let h = 0; h <= 1; h++){    
             evalArr(h, arr);
         }
 
         //evaluation function for symbols in array, recursively returns until array.length value = 1
-        function evalArr(h, arr){
-            console.log(arr);    
+        function evalArr(h, arr){   
             if(arr.length <= 1){
                 console.log(arr, "This array is done");
                 return arr;
@@ -133,19 +89,17 @@ let calculator = new function(){
                     let nextInd = arr[i+1];
 
                     if (h < 1){  //index refers to toOperate h loop
-
-                    console.log(arr)
                         switch(arr[i]){
                             case "*":
                                 (() => {
                                     let result = Number(prevInd) * Number(nextInd);
-                                    calculator.insertResults((i-1), result); //FIXED!
+                                    insertResults((i-1), result); //FIXED!
                                 })();
                                 break;
                             case "/":
                                 (() => {
                                     let result = Number(prevInd) / Number(nextInd);
-                                    calculator.insertResults((i-1), result); //ALSO FIXED!
+                                    insertResults((i-1), result); //ALSO FIXED!
                                 })();
                                 break;
                         }
@@ -154,13 +108,13 @@ let calculator = new function(){
                             case "+":
                                 (() => {
                                     let result = +prevInd + +nextInd;
-                                    calculator.insertResults((i-1), result);
+                                    insertResults((i-1), result);
                                 })();
                                 break;
                             case "-":
                                 (() => {
                                     let result = Number(prevInd) - Number(nextInd);
-                                    calculator.insertResults((i-1), result);
+                                    insertResults((i-1), result);
                                 })();
                                 break;                                                                                  
                             }
@@ -170,31 +124,74 @@ let calculator = new function(){
             return calcDisplay.innerText = arr.join("");
         };
     }
+
+    //bound to each button except "="
+    //outputs button presses to calcDisplay
+    let outputDisplay = function(){
+    if (prevCalc === true){ //resets calcDisplay for new calculation 
+        calcDisplay.innerText = "";
+        prevCalc = false;
+    }
+    if(!isNaN(+this.innerText) || ((this.innerText === ".") || this.innerText === "-")){ 
+        //used to overwrite 0 or non-"-" as first character 
+        if((calcDisplay.innerText.length === 1) && (calcDisplay.innerText === "0" || calcDisplay.innerText === "+" || calcDisplay.innerText === "*" || calcDisplay.innerText === "/")){
+            calcDisplay.innerText = this.innerText;
+            storedValue = ""; 
+        } else {
+        //if input is a number or decimal, adds to calcDisplay
+        calcDisplay.innerText += this.innerText;
+        };
+      } else {
+        //if input is not a number
+        if((!pattern.test(calcDisplay.innerText.slice(-1)) && (!calcDisplay.innerText.endsWith("."))) || ((calcDisplay.innerText.length === 0 && this.innerText === "-"))){  //checks if last character stored on calcDisplay is *not* an operator and not a decimal
+            calcDisplay.innerText += this.innerText;                    //then add input (non-number character)
+        } 
+        else {                                                                        //otherwise
+            calcDisplay.innerText = calcDisplay.innerText.slice(0,-1) + this.innerText; //replace last character on calcDisplay with input ()
+            storedValue = calcDisplay.innerText.slice(0,-1); 
+        };
+    };  
+    }
+
+    let calculate = function(){ 
+        if(pattern.test(calcDisplay.innerText.slice(-1))){
+            calcDisplay.innerText = calcDisplay.innerText.slice(0,-1);
+            storedValue = calcDisplay.innerText;
+        }             
+        toArr() //passes calculator.value to calculator.toArr for conversion of string to array with each group of numbers and each operator in a separate element
+        prevCalc = true;
+    }
+    
+    //bound to each button except "="
+    let storeNumValue = function(){
+        storedValue += this.innerText; //adds pressed input value to calculator.value
+    }
+
+    this.addCalculate = (function() {
+        for(let elem of btnElem){
+            if(elem.innerText === "="){
+                elem.addEventListener("click", calculate); 
+            };
+        };
+    })();
+
+    this.addStoreNumValue = (function() {
+        for(let elem of btnElem){
+            if(elem.innerText !== "="){
+                elem.addEventListener("click", storeNumValue);
+            };
+        };
+    })();
+
+    this.addOutputDisplay = (function() {
+        for(let elem of btnElem){
+            if(elem.innerText !== "="){
+                elem.addEventListener("click", outputDisplay);
+            };
+        };
+    })();
 };
 
-(function() {
-    for(let elem of btnElem){
-        if(elem.innerText !== "="){
-            elem.addEventListener("click", outputDisplay);
-        };
-    };
-})();
-
-(function() {
-    for(let elem of btnElem){
-        if(elem.innerText !== "="){
-            elem.addEventListener("click", storeNumValue);
-        };
-    };
-})();
-
-(function() {
-    for(let elem of btnElem){
-        if(elem.innerText === "="){
-            elem.addEventListener("click", calculate); 
-        };
-    };
-})();
 
 
 
