@@ -119,7 +119,8 @@ let calculator = new function(){
         }
 
         //evaluation function for symbols in array, recursively returns until array.length value = 1
-        function evalArr(h, arr){    
+        function evalArr(h, arr){
+            console.log(arr);    
             if(arr.length <= 1){
                 console.log(arr, "This array is done");
                 return arr;
@@ -133,11 +134,12 @@ let calculator = new function(){
 
                     if (h < 1){  //index refers to toOperate h loop
 
+                    console.log(arr)
                         switch(arr[i]){
                             case "*":
                                 (() => {
                                     let result = Number(prevInd) * Number(nextInd);
-                                    calculator.toOperate(calculator.arr.splice((i-1), 3, result)); //FIXED!
+                                    calculator.insertResults((i-1), result); //FIXED!
                                 })();
                                 break;
                             case "/":
